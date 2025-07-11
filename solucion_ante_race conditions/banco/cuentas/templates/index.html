@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Condiciones de carrera - Simulación</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; }
+    button { padding: 10px 20px; margin: 5px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h1>PyCUN 32 - Mecanismos de sincronización para evitar race conditions en Django con codigo asincrono</h1>
+
+  <h2>Herramientas</h2>
+  <button onclick="window.open('/saldo/', '_blank')">Consultar saldo actual</button>
+  <button onclick="window.open('/reset/', '_blank')">Resetear saldo a 1000</button>
+  <br>
+  <br>
+  <h2>Ejemplos</h2>
+  <h3>Ejemplo 1: con condicion de carrera</h3>
+  <button onclick="simularTransacciones()">Lanzar depósitos y cargos simultáneamente</button>
+
+  <h3>Ejemplo 2: condicion de carrera resuelto con threading.Lock</h3>
+<button onclick="simularTransaccionesConLock()">Lanzar depósitos y cargos con Lock</button>
+
+  <h3>Ejemplo 3 - Condición de carrera con Celery (no funciona Lock)</h3>
+<button onclick="simularTransaccionesCelery()">Lanzar transacciones con Celery</button>
+
+  <h3>Ejemplo 4 - Condición de carrera con Celery resuelto con transactions.atomic</h3>
+<button onclick="simularTransaccionesAtomic()">Lanzar depósitos y cargos con transaccin</button>
+
+
+<script>
+  // Ejemplo 1 - race condition
+  function simularTransacciones() {
+    const depositos = [10, 20, 30, 25, 15, 5, 35, 10, 40, 5];
+    const cargos = [50, 40, 30, 20, 10];
+    const urls = [];
+
+    depositos.forEach((cantidad, i) => {
+      const user = `user${i}`;
+      urls.push(`/depositar/?username=${user}&cantidad=${cantidad}`);
+    });
+
+    cargos.forEach(cantidad => {
+      urls.push(`/cargar/?cantidad=${cantidad}`);
+    });
+
+    urls.sort(() => Math.random() - 0.5);
+
+    urls.forEach(url => window.open(url, '_blank'));
+  }
+</script>
+
+<script>
+  // Ejemplo  2 - Lock
+  function simularTransaccionesConLock() {
+    const depositos = [10, 20, 30, 25, 15, 5, 35, 10, 40, 5];
+    const cargos = [50, 40, 30, 20, 10];
+
+    const urls = [];
+
+    depositos.forEach((cantidad, i) => {
+      const user = `user${i}`;
+      urls.push(`/depositar_lock/?username=${user}&cantidad=${cantidad}`);
+    });
+
+    cargos.forEach(cantidad => {
+      urls.push(`/cargar_lock/?cantidad=${cantidad}`);
+    });
+
+    urls.sort(() => Math.random() - 0.5);
+
+    urls.forEach(url => window.open(url, '_blank'));
+  }
+</script>
+
+<script>
+    // Ejemplo  3 - celey race conditions
+  function simularTransaccionesCelery() {
+    const depositos = [10, 20, 30, 25, 15, 5, 35, 10, 40, 5];
+    const cargos = [50, 40, 30, 20, 10];
+
+    const urls = [];
+
+    depositos.forEach((cantidad, i) => {
+      const user = `user${i}`;
+      urls.push(`/celery/depositar/?username=${user}&cantidad=${cantidad}`);
+    });
+
+    cargos.forEach(cantidad => {
+      urls.push(`/celery/cargar/?cantidad=${cantidad}`);
+    });
+
+    urls.sort(() => Math.random() - 0.5);
+
+    urls.forEach(url => window.open(url, '_blank'));
+  }
+</script>
+
+<script>
+    // Ejemplo  4 - celey race conditions solucion transactions.atomic
+  function simularTransaccionesAtomic() {
+    const depositos = [10, 20, 30, 25, 15, 5, 35, 10, 40, 5];
+    const cargos = [50, 40, 30, 20, 10];
+
+    const urls = [];
+
+    depositos.forEach((cantidad, i) => {
+      const user = `user${i}`;
+      urls.push(`/atomic/depositar/?username=${user}&cantidad=${cantidad}`);
+    });
+
+    cargos.forEach(cantidad => {
+      urls.push(`/atomic/cargar/?cantidad=${cantidad}`);
+    });
+
+    urls.sort(() => Math.random() - 0.5);
+
+    urls.forEach(url => window.open(url, "_blank"));
+  }
+</script>
+
+
+</body>
+</html>

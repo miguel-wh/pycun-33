@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql8-pycun
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: temporal1
+      MYSQL_DATABASE: banco
+      MYSQL_USER: pycun
+      MYSQL_PASSWORD: pycun_test
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
